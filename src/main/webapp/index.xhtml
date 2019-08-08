@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: User
+  Date: 05.08.2019
+  Time: 14:50
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f = "http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Тестовое задание НТЦ АРГУС: Java EE</title>
+</h:head>
+
+<h:body>
+    <h:form id="form">
+        <p:tabView id ="tabView">
+            <p:tab title="Справочники" id = "bookTab">
+                <p:accordionPanel id="bookPanel">
+                    <p:tab title="Адресные точки">
+                        <p:dataTable value="#{myCDIClass.allBuildings}" var="building" id = "buildingTab">
+                            <p:column headerText="Номер">
+                                #{building.number}
+                            </p:column>
+                            <p:column headerText="Улица">
+                                #{building.street}
+                            </p:column>
+                            <p:column headerText="Регион">
+                                #{building.region}
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="Услуги">
+                        <p:dataTable value="#{myCDIClass.allServices}" var="service">
+                            <p:column headerText="Наименование">
+                                #{service.name}
+                            </p:column>
+                            <p:column headerText="Владелец">
+                                #{service.serviceOwner.name}
+                            </p:column>
+                            <p:column headerText="ресуры">
+                                #{service.OTAList}
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="Объекты технического учета">
+                        <p:dataTable value="#{myCDIClass.allDevices}" var="device">
+                            <p:column headerText="Наименование">
+                                #{device.name}
+                            </p:column>
+                            <p:column headerText="Тип">
+                                #{device.type}
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="Абоненты" id="SubscribersTab">
+                        <p:commandButton value="Добавить" type="button" onclick="PF('createSubDialog').show()" />
+                        <p:dataTable value="#{myCDIClass.allSubscribers}" var="subscriber" id="subscriber">
+                            <p:column headerText="Наименование">
+                                #{subscriber.name}
+                            </p:column>
+                            <p:column headerText="Адрес">
+                                #{subscriber.building.address}
+                            </p:column>
+                            <p:column headerText="Услуги">
+                                #{subscriber.serviceList}
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:tab>
+                </p:accordionPanel>
+
+            </p:tab>
+            <p:tab title="Отчеты">
+                <p:accordionPanel>
+                    <p:tab title="Абоненты, попавшие в зону действия ГП более одного раза за период">
+                        <h:panelGrid columns="4" cellpadding="5">
+                            <h:outputText value="Дата начало:"/>
+                            <p:calendar pattern="dd/MM/yyyy" locale="pt" value="#{reportBean.subDateStart}"/>
+                            <h:outputText value="Дата конец:"/>
+                            <p:calendar pattern="dd/MM/yyyy" locale="pt" value="#{reportBean.subDateFinish}"/>
+                        </h:panelGrid>
+                        <p:commandLink value="Сформировать" action="#{myCDIClass.generateSubGDReport(reportBean.subDateStart,reportBean.subDateFinish)}" update="reportSubGD"/>
+                        <p:dataTable value="#{myCDIClass.listSubGDPerot}" var="reportSubGD" id="reportSubGD">
+                            <p:column headerText="Id ГП">
+                                #{reportSubGD[3]}
+                            </p:column>
+                            <p:column headerText="Дата открытия">
+                                #{reportSubGD[0]}
+                            </p:column>
+                            <p:column headerText="Дата закрытия">
+                                #{reportSubGD[1]}
+                            </p:column>
+                            <p:column headerText="Активность">
+                                #{reportSubGD[2]}
+                            </p:column>
+                            <p:column headerText="id Абонента">
+                                #{reportSubGD[4]}
+                            </p:column>
+                            <p:column headerText="Имя абонента">
+                                #{reportSubGD[5]}
+                            </p:column>
+                            <p:column headerText="Адрес абонента">
+                                Регион: #{reportSubGD[8]}, ул.#{reportSubGD[7]}, д.#{reportSubGD[6]}
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="объекты ТУ, вышедшие из строя более одного раза за период">
+                        <h:panelGrid columns="4" cellpadding="5">
+                            <h:outputText value="Дата начало:"/>
+                            <p:calendar pattern="dd/MM/yyyy" locale="pt" value="#{reportBean.otaDateStart}"/>
+                            <h:outputText value="Дата конец:"/>
+                            <p:calendar pattern="dd/MM/yyyy" locale="pt" value="#{reportBean.otaDateFinish}"/>
+                        </h:panelGrid>
+                        <p:commandLink value="Сформировать" action="#{myCDIClass.generateOTAGDReport(reportBean.otaDateStart,reportBean.otaDateFinish)}" update="reportOTAGD"/>
+                        <p:dataTable value="#{myCDIClass.listOTAGDReport}" var="reportOTAGD" id="reportOTAGD">
+                            <p:column headerText="Id объекта ТУ">
+                                #{reportOTAGD[5]}
+                            </p:column>
+                            <p:column headerText="Имя объекта">
+                                #{reportOTAGD[6]}
+                            </p:column>
+                            <p:column headerText="Адрес">
+                                Регион: #{reportOTAGD[10]}, ул.#{reportOTAGD[9]}, д.#{reportOTAGD[8]}
+                            </p:column>
+                            <p:column headerText="id ГП">
+                                #{reportOTAGD[0]}
+                            </p:column>
+                            <p:column headerText="Дата открытия">
+                                #{reportOTAGD[1]}
+                            </p:column>
+                            <p:column headerText="Дата закрытия">
+                                #{reportOTAGD[2]}
+                            </p:column>
+                            <p:column headerText="Активность">
+                                #{reportOTAGD[4]}
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="История ГП">
+                        <h:panelGrid columns="4" cellpadding="5">
+                            <h:outputText value="Дата начало:"/>
+                            <p:calendar pattern="dd/MM/yyyy" locale="pt" value="#{reportBean.historyGDDateStart}"/>
+                            <h:outputText value="Дата конец:"/>
+                            <p:calendar pattern="dd/MM/yyyy" locale="pt" value="#{reportBean.historyGDDateFinish}"/>
+                        </h:panelGrid>
+                        <p:commandLink value="Сформировать" action="#{myCDIClass.generateHistoryGDReport(reportBean.historyGDDateStart,reportBean.historyGDDateFinish)}" update="reportHistoryGD"/>
+                        <p:dataTable value="#{myCDIClass.listHistoryGDReport}" var="reportHistoryGD" id="reportHistoryGD">
+                            <p:column headerText="Id ГП">
+                                #{reportHistoryGD.id}
+                            </p:column>
+                            <p:column headerText="Дата открытия">
+                                #{reportHistoryGD.dateStart}
+                            </p:column>
+                            <p:column headerText="Дата закрытия">
+                                #{reportHistoryGD.dateFinish}
+                            </p:column>
+                            <p:column headerText="Правило">
+                                #{reportHistoryGD.damageRule.typeRule.name}
+                            </p:column>
+                            <p:column headerText="Объекты ТУ">
+                                #{reportHistoryGD.objectsTA}
+                            </p:column>
+                            <p:column headerText="Адреса">
+                                #{reportHistoryGD.buildings}
+                            </p:column>
+                            <p:column headerText="Абоненты">
+                                #{reportHistoryGD.subscribers}
+                            </p:column>
+                            <p:column headerText="Услуги">
+                                #{reportHistoryGD.realizedServices}
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:accordionPanel>
+            </p:tab>
+            <p:tab title="Групповое повреждение">
+                <h:panelGrid columns="5" cellpadding="5">
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <p:outputLabel for="node" value="Узел: " />
+                        <p:selectOneMenu id="node" value="#{dropdownView.idNode}" style="width:150px">
+                            <f:selectItem itemLabel="Узел" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{dropdownView.otaNode}" />
+                        </p:selectOneMenu>
+                        По узлу:
+                        <p:commandButton value="По узлу" action="#{myCDIClass.createGPByNode(dropdownView.idNode)}" update="damageGroup"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <p:outputLabel for="cable" value="Кабель: " />
+                        <p:selectOneMenu id="cable" value="#{dropdownView.idCable}" style="width:150px">
+                            <f:selectItem itemLabel="Кабель" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{dropdownView.otaCable}" />
+                        </p:selectOneMenu>
+                        По узлу:
+                        <p:commandButton value="По кабелю" action="#{myCDIClass.createGPByCable(dropdownView.idCable)}" update="damageGroup"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <p:outputLabel for="connector" value="Коннектор: " />
+                        <p:selectOneMenu id="connector" value="#{dropdownView.idConnector}" style="width:150px">
+                            <f:selectItem itemLabel="Коннектор" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{dropdownView.otaConnector}" />
+                        </p:selectOneMenu>
+                        По узлу:
+                        <p:commandButton value="По коннектору" action="#{myCDIClass.createGPByConnector(dropdownView.idConnector)}" update="damageGroup"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <p:separator />
+                <p:dataTable value="#{myCDIClass.allDG}" var="damageGroup" id="damageGroup">
+                    <p:column headerText="id">
+                        #{damageGroup.id}
+                    </p:column>
+                    <p:column headerText="Дата открытия">
+                        #{damageGroup.dateStart}
+                    </p:column>
+                    <p:column headerText="Правило">
+                        #{damageGroup.damageRule.typeRule.name}
+                    </p:column>
+                    <p:column headerText="Объекты ТУ">
+                        #{damageGroup.objectsTA}
+                    </p:column>
+                    <p:column headerText="Адреса">
+                        #{damageGroup.buildings}
+                    </p:column>
+                    <p:column headerText="Абоненты">
+                        #{damageGroup.subscribers}
+                    </p:column>
+                    <p:column headerText="Услуги">
+                        #{damageGroup.realizedServices}
+                    </p:column>
+                    <p:column headerText="Операции">
+                            <p:commandLink value="Закрыть ГП" action="#{myCDIClass.closeGD(damageGroup)}" update="damageGroup"/>
+                    </p:column>
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="Дополнительно">
+                <p:commandLink value="Заполнить первоначальными данными" action="#{myCDIClass.createUser()}"/>
+            </p:tab>
+        </p:tabView>
+    </h:form>
+
+
+    <p:dialog widgetVar="createSubDialog" closeOnEscape="true" modal="true" header="Добавить абонента">
+        <h:form id = "createSubForm">
+            <p:focus/>
+            <p:panelGrid columns="2">
+                Наименование:
+                <p:inputText value="#{myCDIClass.name}"/>
+                Регион:
+                <p:inputText value="#{myCDIClass.region}"/>
+                Улица:
+                <p:inputText value="#{myCDIClass.street}"/>
+                Дом:
+                <p:inputText value="#{myCDIClass.number}"/>
+                Услуги:
+                <p:pickList id="pickListService" value="#{myCDIClass.dualListServices}" var="dualListServices" itemLabel="#{dualListServices}" itemValue="#{dualListServices}" />
+
+            </p:panelGrid>
+            <p:commandButton value="Сохранить" action="#{myCDIClass.createSubscriber()}"  update=":form:tabView:bookPanel:subscriber, :form:tabView:bookPanel:buildingTab" onclick="PF('createSubDialog').close()"/>
+        </h:form>
+    </p:dialog>
+
+
+</h:body>
+
+</html>
