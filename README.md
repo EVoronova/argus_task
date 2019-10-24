@@ -1,4 +1,7 @@
 # Тестовое задание НТЦ АРГУС: Java EE
+## Стек технологий
+ github, maven, java 8/java 11, wildfly, cdi, ejb, hibernate, oracle/postgres, jsf, primefaces
+ 
 ## Модель данных.
 
 * Объекты технического учета(имеет предопределенные типы : узел, коннектор, кабель.)
